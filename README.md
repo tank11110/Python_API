@@ -1,3 +1,7 @@
+## 目前版本問題
+
+FLASK上下文設置失效，導致無法正確開啟DB
+
 ## 啟用方式
 1. git clone https://github.com/tank11110/Python_API
 2. docker-compose up --build
