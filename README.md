@@ -1,3 +1,10 @@
+## 啟用方式
+1. git clone https://github.com/tank11110/Python_API
+2. docker-compose up --build
+
+
+在使用這些 API 之前，請確保您的服務已通過 `docker-compose up` 命令啟動。
+
 ## GET方法
 
 curl -X GET http://localhost:5000/product
