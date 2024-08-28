@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import OperationalError
+import time
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:123@db:5432/test_db'  # Docker內部的DB地址
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:123@db:5432/test_db'
 db = SQLAlchemy(app)
 
 class Product(db.Model):
@@ -26,6 +28,23 @@ class Product(db.Model):
             'inventory': self.inventory,
             'color': self.color,
         }
+
+def initialize_db():
+    retries = 5
+    while retries:
+        try:
+            db.create_all()
+            break
+        except OperationalError:
+            retries -= 1
+            print(f"Trying connect db ({5 - retries}/5)")
+            time.sleep(5)
+    else:
+        print("Connect failed")
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({'message': 'Hello API Project'})
 
 @app.route('/products', methods=['GET'])
 def get_products():
@@ -60,9 +79,7 @@ def delete_product(id):
     db.session.commit()
     return jsonify({'message': 'Product deleted'})
 
-with app.app_context():
-    db.create_all()
-    pass
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    with app.app_context():
+        initialize_db()
+    app.run(debug=True, host='0.0.0.0')
